@@ -1,5 +1,6 @@
 const pool = require('../db/pool')
 
+
 const fetchAll = () => {
   const text = `
     WITH numbers AS (
@@ -7,6 +8,7 @@ const fetchAll = () => {
         array_agg(value) AS numbers,
         factory_id
       FROM factory_numbers
+      WHERE archived_at IS NULL
       GROUP BY factory_id
     )
     SELECT
