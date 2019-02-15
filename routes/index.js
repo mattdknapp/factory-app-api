@@ -1,9 +1,20 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express')
+const router = express.Router()
+const factoryQueries = require('../queries/factories')
 
-/* GET home page. */
 router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+  factoryQueries.fetchAll()
+    .then(data => {
+      res.json({
+        factories: data.rows
+      })
+    })
+    .catch(err => {
+      console.error(err)
+      res.status(500).json({
+        message: 'internal server error'
+      })
+    })
+})
 
-module.exports = router;
+module.exports = router
