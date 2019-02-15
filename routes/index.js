@@ -2,7 +2,7 @@ const express = require('express')
 const router = express.Router()
 const factoryQueries = require('../queries/factories')
 
-router.get('/', function(req, res, next) {
+router.get('/', (req, res, next) => {
   factoryQueries.fetchAll()
     .then(data => {
       res.json({
