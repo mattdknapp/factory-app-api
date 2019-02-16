@@ -26,6 +26,7 @@ app.use(cookieParser())
 app.use('/', indexRouter)
 io.on('connection', eventHandlers)
 
-//module.exports = app
-
-http.listen(3001)
+module.exports = {
+  app,
+  server: http
+}
