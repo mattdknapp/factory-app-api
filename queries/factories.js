@@ -1,4 +1,5 @@
 const pool = require('../db/pool')
+const transaction = require('../lib/transaction')
 
 const isolateResult = response => {
   return response && response.rows[0]
@@ -66,7 +67,85 @@ const fetchAll = () => {
   return pool.query({ text })
 }
 
-//{"id":2,"name":"Updated","min":2,"max":300,"numbers":[111,222]}
+const create = data => {
+  const {
+    name,
+    min,
+    max
+  } = data
+
+  const text = `
+    INSERT INTO factories
+      (name, min, max, created_at, updated_at)
+    VALUES
+      ($1, $2, $2, NOW(), NOW())
+    RETURNING *
+  `
+
+  const values = [
+    name,
+    min,
+    max
+  ]
+
+  const opts = {
+    text,
+    values
+  }
+
+  return pool.query(opts)
+    .then(isolateResource)
+}
+
+const createNumbersFor = ({id, count}) => {
+  const archiveText = `
+    UPDATE factory_numbers
+    SET archived_at = NOW()
+    WHERE archived_at IS NULL
+      AND factory_id = $1
+  `
+
+  const archiveValues = [
+    id
+  ]
+
+  const archiveOpts = {
+    text: archiveText,
+    values: archiveValues
+  }
+
+  const createText = `
+    INSERT INTO factory_numbers
+      (factory_id, value, created_at)
+    (SELECT
+        $1,
+        floor(random() * (f.max - f.min + 1) + f.min)::int,
+        NOW()
+      FROM generate_series(1, $2) gs
+      JOIN factories AS f
+        ON f.id = f.id
+      WHERE f.id = $1)
+  `
+
+  const createValues = [
+    id,
+    count
+  ]
+
+  const createOpts = {
+    text: createText,
+    values: createValues
+  }
+
+  const queries = [
+    archiveOpts,
+    createOpts
+  ]
+
+  console.log("Just before")
+  return transaction(queries)
+}
+
 const update = data => {
   const {
     id,
@@ -106,5 +185,6 @@ const update = data => {
 module.exports = {
   find,
   fetchAll,
+  createNumbersFor,
   update
 }
