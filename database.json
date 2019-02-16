@@ -1,8 +1,20 @@
 {
   "dev": {
     "driver": "pg",
-    "user": "matt",
-    "host": "localhost",
+    "user": "PGUSER",
+    "host": "PGHOST",
+    "database": {
+      "ENV": "PGDATABASE"
+    },
+    "password": {
+      "ENV": "PGPASSWORD"
+    }
+  },
+  "production": {
+    "driver": "pg",
+    "user": "PGUSER",
+    "host": "PGHOST",
+    "native": true,
     "database": {
       "ENV": "PGDATABASE"
     },
