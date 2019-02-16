@@ -13,7 +13,7 @@ const indexRouter = require('./routes/index')
 const eventHandlers = require('./eventHandlers/index')(io)
 
 const corsOpts = {
-  origin: 'http://localhost:3000',
+  origin: process.env.CLIENT_URL,
   optionSuccessStatus: 200
 }
 
