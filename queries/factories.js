@@ -24,7 +24,7 @@ const find = ({ id }) => {
     JOIN numbers n
       ON n.factory_id = f.id
     WHERE archived IS NOT true
-    AND id = $1
+    AND f.id = $1
   `
 
   const values = [
@@ -104,6 +104,7 @@ const update = data => {
 }
 
 module.exports = {
+  find,
   fetchAll,
   update
 }
