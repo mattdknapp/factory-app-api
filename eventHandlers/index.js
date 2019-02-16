@@ -1,7 +1,7 @@
 const factoryQueries = require('../queries/factories')
 const factoryValidator = require('../lib/validators/factory')
 
-const acknowledge = ack => () => ack({ ok: true })
+const acknowledge = ack => () => ack && ack({ ok: true })
 
 const syncFactory = (socket, io) => res => {
   io.sockets.emit('SYNC_FACTORY', JSON.stringify(res))
@@ -15,9 +15,9 @@ const removeFactory = (socket, io) => data => {
   io.sockets.emit('REMOVE_FACTORY', JSON.stringify({ id }))
 }
 
-const handleException = err => {
+const handleException = (socket, ack) => err => {
+  console.error(err)
   socket.emit('exception', err)
-  ack({ error: err })
 }
 
 const updateNumbers = count => data => {
@@ -32,7 +32,7 @@ const createFactory = (socket, io) => (data, ack) => {
     .then(updateNumbers(json.count))
     .then(syncFactory(socket, io))
     .then(acknowledge(ack))
-    .catch(handleException)
+    .catch(handleException(socket, ack))
 }
 
 const updateFactory = (socket, io) => (data, ack) => {
@@ -42,7 +42,7 @@ const updateFactory = (socket, io) => (data, ack) => {
     .then(updateNumbers(json.count))
     .then(syncFactory(socket, io))
     .then(acknowledge(ack))
-    .catch(handleException)
+    .catch(handleException(socket))
 }
 
 const archiveFactory = (socket, io) => (data, ack) => {
@@ -51,7 +51,7 @@ const archiveFactory = (socket, io) => (data, ack) => {
   factoryQueries.archive(json)
     .then(removeFactory(socket, io))
     .then(acknowledge(ack))
-    .catch(handleException)
+    .catch(handleException(socket))
 }
 
 const initHandlers = io => socket => {
