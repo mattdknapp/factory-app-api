@@ -28,7 +28,6 @@ const updateNumbers = count => data => {
 const createFactory = (socket, io) => (data, ack) => {
   const json = JSON.parse(data)
 
-  console.log("PING")
   factoryQueries.create(json)
     .then(updateNumbers(json.count))
     .then(syncFactory(socket, io))
