@@ -9,14 +9,12 @@ const syncFactory = (socket, io) => res => {
 
 const updateFactory = (socket, io) => (data, ack) => {
   const json = JSON.parse(data)
+  const updateNumbers = () => factoryQueries.createNumbersFor(json)
+  const getNewestFactoryState = () => factoryQueries.find(json)
 
   factoryQueries.update(json)
-    .then(() => {
-      return factoryQueries.createNumbersFor({...json, count: 5})
-    })
-    .then(() => {
-      return factoryQueries.find(json)
-    })
+    .then(updateNumbers)
+    .then(getNewestFactoryState)
     .then(syncFactory(socket, io))
     .then(acknowledge(ack))
     .catch(err => {
