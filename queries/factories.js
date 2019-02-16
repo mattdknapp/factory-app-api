@@ -181,10 +181,34 @@ const update = data => {
     .then(isolateResult)
 }
 
+const archive = ({ id }) => {
+  const text = `
+    UPDATE factories
+    SET
+      archived = true
+    WHERE
+      id = $1
+    RETURNING *
+  `
+
+  const values = [
+    id
+  ]
+
+  const opts = {
+    text,
+    values
+  }
+
+  return pool.query(opts)
+    .then(isolateResult)
+}
+
 module.exports = {
   find,
   fetchAll,
   createNumbersFor,
   update,
-  create
+  create,
+  archive
 }
