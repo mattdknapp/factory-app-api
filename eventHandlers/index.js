@@ -1,25 +1,26 @@
 const factoryQueries = require('../queries/factories')
 
-const syncFactory = socket => res => {
-  socket.emit('SYNC_FACTORY', JSON.stringify(res))
+const acknowledge = ack => ack({ ok: true })
+
+const syncFactory = (socket, io) => res => {
+  io.sockets.emit('SYNC_FACTORY', JSON.stringify(res))
 }
 
-const updateFactory = socket => (data, ack) => {
+const updateFactory = (socket, io) => (data, ack) => {
   const json = JSON.parse(data)
 
-  console.log(json)
   factoryQueries.update(json)
     .then(factoryQueries.find)
-    .then(syncFactory(socket))
-    .then(() => ack({ ok: true }))
+    .then(syncFactory(socket, io))
+    .then(acknowledge(ack))
     .catch(err => {
       console.error(err)
       ack({ error: err })
     })
 }
 
-const initHandlers = socket => {
-  socket.on('UPDATE_FACTORY', updateFactory(socket))
+const initHandlers = io => socket => {
+  socket.on('UPDATE_FACTORY', updateFactory(socket, io))
 }
 
 module.exports = initHandlers

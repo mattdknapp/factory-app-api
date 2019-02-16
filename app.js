@@ -10,7 +10,7 @@ const cors = require('cors')
 const io = require('socket.io')(http)
 
 const indexRouter = require('./routes/index')
-const eventHandlers = require('./eventHandlers/index')
+const eventHandlers = require('./eventHandlers/index')(io)
 
 const corsOpts = {
   origin: 'http://localhost:3000',
@@ -28,5 +28,6 @@ io.on('connection', eventHandlers)
 
 module.exports = {
   app,
+  io,
   server: http
 }
