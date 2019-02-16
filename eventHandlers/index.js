@@ -1,10 +1,5 @@
-const Joi = require('joi')
-const schema = require('../schemas/factory')
 const factoryQueries = require('../queries/factories')
-
-const validateAgainstSchema = data => {
-  return Joi.validate(data, schema, { abortEarly: false })
-}
+const factoryValidator = require('../validators/factory')
 
 const acknowledge = ack => ack({ ok: true })
 
@@ -14,14 +9,6 @@ const syncFactory = (socket, io) => res => {
 
 const updateFactory = (socket, io) => (data, ack) => {
   const json = JSON.parse(data)
-  const result = validateAgainstSchema(json)
-
-  if (result.error) {
-    return ack({
-      ok: false,
-      errors: result.error
-    })
-  }
 
   factoryQueries.update(json)
     .then(factoryQueries.find)
@@ -33,6 +20,7 @@ const updateFactory = (socket, io) => (data, ack) => {
 }
 
 const initHandlers = io => socket => {
+  socket.use(factoryValidator)
   socket.on('UPDATE_FACTORY', updateFactory(socket, io))
 }
 
