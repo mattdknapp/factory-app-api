@@ -22,7 +22,7 @@ const find = ({ id }) => {
       max,
       numbers
     FROM factories f
-    JOIN numbers n
+    LEFT JOIN numbers n
       ON n.factory_id = f.id
     WHERE archived IS NOT true
     AND f.id = $1
@@ -58,7 +58,7 @@ const fetchAll = () => {
       max,
       numbers
     FROM factories f
-    JOIN numbers n
+    LEFT JOIN numbers n
       ON n.factory_id = f.id
     WHERE archived IS NOT true
     ORDER BY created_at ASC;
@@ -78,7 +78,7 @@ const create = data => {
     INSERT INTO factories
       (name, min, max, created_at, updated_at)
     VALUES
-      ($1, $2, $2, NOW(), NOW())
+      ($1, $2, $3, NOW(), NOW())
     RETURNING *
   `
 
@@ -94,7 +94,7 @@ const create = data => {
   }
 
   return pool.query(opts)
-    .then(isolateResource)
+    .then(isolateResult)
 }
 
 const createNumbersFor = ({id, count}) => {
@@ -142,7 +142,6 @@ const createNumbersFor = ({id, count}) => {
     createOpts
   ]
 
-  console.log("Just before")
   return transaction(queries)
 }
 
@@ -186,5 +185,6 @@ module.exports = {
   find,
   fetchAll,
   createNumbersFor,
-  update
+  update,
+  create
 }
