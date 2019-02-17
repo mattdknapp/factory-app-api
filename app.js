@@ -10,7 +10,7 @@ const cors = require('cors')
 const io = require('socket.io')(http)
 
 const indexRouter = require('./routes/index')
-const eventHandlers = require('./eventHandlers/index')(io)
+const eventHandlers = require('./eventHandlers/listeners')(io)
 
 const corsOpts = {
   origin: process.env.CLIENT_URL,
