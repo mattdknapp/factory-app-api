@@ -1,7 +1,9 @@
 {
   "dev": {
     "driver": "pg",
-    "user": "matt",
+    "user": {
+      "ENV": "PGUSER"
+    },
     "host": "localhost",
     "database": {
       "ENV": "PGDATABASE"
